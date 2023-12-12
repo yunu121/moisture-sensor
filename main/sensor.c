@@ -18,16 +18,26 @@
 #include "server.h"
 
 /** USER SET VALUES START */
-//  Change these values based on your setup.
-#define SENSOR_PIN GPIO_NUM_36
+//  Change these values based on your setup. Refer to datasheet.
+#define SENSOR_PIN_1 GPIO_NUM_36
+#define SENSOR_UNIT_1 ADC_UNIT_1
+#define SENSOR_CHANNEL_1 ADC_CHANNEL_0
 #define LED_STRIP_PIN GPIO_NUM_14
 
-static const char *TAG = "Moisture Sensor";
+static const char *SERVER = "Server";
+
+static const char *SENSOR1 = "Moisture Sensor 1";
+static const char *SENSOR2 = "Moisture Sensor 2";
+static const char *SENSOR3 = "Moisture Sensor 3";
+
 int optimal_moisture = 60;
 
-static int upper_bound = 4095;
-static int lower_bound = 2095;
+static int upper_bound = 2990;  //Upper bound for raw input, i.e. when it is dry
+static int lower_bound = 1990;  //Lower bound for raw input, i.e. when it is wet
 /** USER SET VALUES END */
+
+static float timers[3] = {0, 0, 0};
+
 
 static uint8_t s_led_state = 0;
 static led_strip_handle_t led_strip;
@@ -61,7 +71,7 @@ httpd_uri_t uri_get = {
 */
 void configure_sensor(gpio_num_t adc_pin, adc_channel_t channel, adc_oneshot_unit_init_cfg_t *adc_config, adc_oneshot_chan_cfg_t *config, adc_oneshot_unit_handle_t *sensor)
 {
-    adc_config -> unit_id = ADC_UNIT_1;
+    adc_config -> unit_id = SENSOR_UNIT_1;
     ESP_ERROR_CHECK(adc_oneshot_new_unit(adc_config, sensor));
     
     config -> bitwidth = ADC_BITWIDTH_DEFAULT;
@@ -102,7 +112,7 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
 
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
-        ESP_LOGI(TAG, "Server running @ " IPSTR, IP2STR(&event->ip_info.ip));
+        ESP_LOGI(SERVER, "Server running @ " IPSTR, IP2STR(&event->ip_info.ip));
         
         s_retry_num = 0;
         
@@ -159,11 +169,11 @@ void connect_wifi(void)
                                            portMAX_DELAY);
 
     if (bits & WIFI_CONNECTED_BIT) {
-        ESP_LOGI(TAG, "Connected to AP -> SSID: %s, Password: %s", CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
+        ESP_LOGI(SERVER, "Connected to AP -> SSID: %s, Password: %s", CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
     } else if (bits & WIFI_FAIL_BIT) {
-        ESP_LOGI(TAG, "Failed to connect -> SSID: %s, Password: %s", CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
+        ESP_LOGI(SERVER, "Failed to connect -> SSID: %s, Password: %s", CONFIG_ESP_WIFI_SSID, CONFIG_ESP_WIFI_PASSWORD);
     } else {
-        ESP_LOGE(TAG, "Unexpected Error");
+        ESP_LOGE(SERVER, "Unexpected Error");
     }
     
     vEventGroupDelete(s_wifi_event_group);
@@ -177,18 +187,42 @@ esp_err_t send_web_page(httpd_req_t *req)
 {
     char moisture_str[5];
     char optimal_str[5];
+    char timer_str_1[5];
+    char timer_str_2[5];
+    char timer_str_3[5];
     int response;
 
     snprintf(moisture_str, sizeof(moisture_str), "%d%%", moisture);
     snprintf(optimal_str, sizeof(optimal_str), "%d%%", optimal_moisture);
+    snprintf(timer_str_1, sizeof(timer_str_1), "%.2f", timers[0]/3600);
+    snprintf(timer_str_2, sizeof(timer_str_2), "%.2f", timers[1]/3600);
+    snprintf(timer_str_3, sizeof(timer_str_3), "%.2f", timers[2]/3600);
 
-    const char resp[] = "<h1 style='font-family:verdana'>Plant 1</h1>"
-                        "<p style='font-family:verdana'>Moisture: %s</p>"
-                        "<p style='font-family:verdana'>Optimal Moisture: %s</p>";
-    
-    char html_response[sizeof(resp) + sizeof(moisture_str) + sizeof(optimal_str)];
+    const char resp[] = "<style>"
+                        "body {font-family:verdana;}"
+                        "h1, h2, h3 {font-family: verdana;}"
+                        "p {font-family: verdana;}"
+                        ".p1 {font-family: verdana; font-size: 12px;}"
+                        "</style>"
 
-    snprintf(html_response, sizeof(html_response), resp, moisture_str, optimal_str);
+                        "<h1>Plant Moisture Levels</h1>"
+                        "<p><i>The plants in this planter are all expected to have a similar optimal moisture of: %s</i></p>"
+
+                        "<h2>Plant 1</h1>"
+                        "<p>Moisture: %s</p>"
+                        "<p class='p1'><i>Last watered: %s hrs ago</i></p>"
+
+                        "<h2>Plant 2</h2>"
+                        "<p>Moisture: %s</p>"
+                        "<p class='p1'><i>Last watered: %s hrs ago</i></p>"
+
+                        "<h2>Plant 2</h2>"
+                        "<p>Moisture: %s</p>"
+                        "<p class='p1'><i>Last watered: %s hrs ago</i></p>";
+
+    char html_response[sizeof(resp) + sizeof(moisture_str) + sizeof(optimal_str) + sizeof(timer_str_1) + sizeof(timer_str_2) + sizeof(timer_str_3)];
+
+    snprintf(html_response, sizeof(html_response), resp, optimal_str, moisture_str, timer_str_1, moisture_str, timer_str_2, moisture_str, timer_str_3);
 
     response = httpd_resp_send(req, html_response, HTTPD_RESP_USE_STRLEN);
     
@@ -219,6 +253,25 @@ httpd_handle_t setup_server(void)
     return server;
 }
 
+void log_values(void) 
+{
+    ESP_LOGI(SENSOR1, "Raw Value = %d", moisture);
+    ESP_LOGI(SENSOR2, "Raw Value = %d", moisture);
+    ESP_LOGI(SENSOR3, "Raw Value = %d", moisture);
+    moisture = ((moisture - lower_bound) * (0 - optimal_moisture)) / (upper_bound - lower_bound) + optimal_moisture;
+    ESP_LOGI(SENSOR1, "Moisture = %d%%", moisture);
+}
+
+void check_timers(void)
+{
+    for (int i = 0; i < 3; i++) {
+        if (timers[i] > 3600) {
+            //water
+        }
+        timers[i]++;
+    }
+}
+
 /** Main function  */
 void app_main(void)
 {
@@ -234,15 +287,13 @@ void app_main(void)
     connect_wifi();
     setup_server();
 
-    configure_sensor(SENSOR_PIN, ADC_CHANNEL_0, &adc_config, &config, &sensor);
+    configure_sensor(SENSOR_PIN_1, SENSOR_CHANNEL_1, &adc_config, &config, &sensor);
     configure_led(LED_STRIP_PIN, &strip_config, &rmt_config, &led_strip);
     
     while (1) {
         read_sensor(sensor, ADC_CHANNEL_0, &moisture);
-        ESP_LOGI(TAG, "Raw Value = %d", moisture);
-        moisture = ((moisture - lower_bound) * (0 - 100)) / (upper_bound - lower_bound) + 100;
-        ESP_LOGI(TAG, "Moisture = %d%%", moisture);
-
+        log_values();
+        
         if (moisture < 25) {
             blink_led(1, s_led_state, led_strip);
         } else if (moisture > optimal_moisture) {
@@ -254,5 +305,6 @@ void app_main(void)
 
         s_led_state = !s_led_state;
         vTaskDelay(1000 / portTICK_PERIOD_MS);
+        check_timers();
     }
 }
