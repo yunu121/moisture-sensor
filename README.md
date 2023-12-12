@@ -14,10 +14,10 @@ In order to build moisture_sensor you need all the dependencies by following [th
 Flashing to ESP32
 -----------------
 Open sensor.c and adjust values from lines 22-29 depending on your setup.\
-Make sure to calibrate the values by testing upper and lower bounds.\
+Make sure to calibrate the values by testing upper and lower bounds.
 
 Now open sdkconfig and search for "Wi-Fi Configuration" and edit these values based
-on your Wi-Fi settings.\
+on your Wi-Fi settings.
 
 **Afterwards enter the commands:**\
 ```idf.py set-target esp32```\
