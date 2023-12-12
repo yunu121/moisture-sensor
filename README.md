@@ -12,6 +12,8 @@ Clone this repository to esp:
     cd /user/esp
     git clone <https://github.com/yunu121/sensor.git>
 
+Flashing to ESP32
+-----------------
 Open sensor.c and adjust values from lines 22-29 depending on your setup
     Make sure to calibrate the values by testing upper and lower bounds
 
