@@ -18,6 +18,16 @@ Make sure to calibrate the values by testing upper and lower bounds.
 
 Now open sdkconfig and search for "Wi-Fi Configuration" and edit these values based
 on your Wi-Fi settings.
+```
+# Wi-Fi Configuration
+#
+CONFIG_ESP_WIFI_SSID="ESP32"
+CONFIG_ESP_WIFI_PASSWORD="12345678"
+CONFIG_ESP_WIFI_CHANNEL=1
+CONFIG_ESP_MAX_STA_CONN=4
+CONFIG_ESP_MAX_RETRY=5
+# end of Wi-Fi Configuration
+```
 
 **Afterwards enter the commands:**\
 ```idf.py set-target esp32```\
