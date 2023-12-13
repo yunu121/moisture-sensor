@@ -14,7 +14,7 @@ In order to build **sensor** you need all the dependencies for the ESP32 by foll
 Preparations Before Flashing
 ----------------------------
 Open [user_defined.h](https://github.com/yunu121/sensor/blob/main/main/user_defined.h) and adjust macros depending on your setup.\
-Refer to the [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) to determine the correct GPIO pins and ADC channels for your exact specifications.\
+Refer to the [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) to determine the correct GPIO pins and ADC channels for your exact specifications.
 
 Now open sdkconfig and search for "Wi-Fi Configuration" and edit the following values based
 on your Wi-Fi settings.\
