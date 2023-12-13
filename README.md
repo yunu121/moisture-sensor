@@ -39,7 +39,7 @@ Make sure to calibrate the values by testing and recording both upper and lower 
 
 **This can be done by:**
 - Measuring the raw value when the moisture sensor is dry,
-- Measuring the raw value when the moisture sensor is fully wet, i.e submerged in water.
+- Measuring the raw value when the moisture sensor is fully wet, i.e. submerged in water.
 
 **Then flash again, for a second time.**
 
