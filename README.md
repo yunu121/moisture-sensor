@@ -24,19 +24,22 @@ on your Wi-Fi settings.\
 **To flash, enter the commands:**\
 ```idf.py set-target esp32```\
 ```idf.py build```\
-```idf.py -p <serial-port> flash monitor```\
+```idf.py -p <serial-port> flash monitor```
+
 Note: For help on determining the serial port, follow [this guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/establish-serial-connection.html).
 
 After First-Time Flash
 ----------------------
 After running the commands shown in the above section, you will be able to see the ESP32 monitor in your terminal.\
 This is particularly useful as you will be able to calibrate the sensors based on the raw input displayed.
-Make sure to calibrate the values by testing and recording both upper and lower bounds of your sensors, in [user_defined.h](https://github.com/yunu121/sensor/blob/main/main/user_defined.h).\
+Make sure to calibrate the values by testing and recording both upper and lower bounds of your sensors, in [user_defined.h](https://github.com/yunu121/sensor/blob/main/main/user_defined.h).
+
 **This can be done by:**
 - Measuring the raw value when the moisture sensor is dry,
 - Measuring the raw value when the moisture sensor is fully wet, i.e submerged in water.
 
-**Then flash again, for a second time.**\
+**Then flash again, for a second time.**
+
 ```idf.py -p <serial-port> flash monitor```
 
 Using the ESP32 as a Moisture Sensor
@@ -51,8 +54,10 @@ was configured properly (remember everything is case sensitive)!
 
 **Make sure to take note of the IP, as this will be used to access the HTTP server for the plants.**
 
-Next, paste the displayed IP into your desired browser, followed by /sensor, so for example\
-```127.0.0.1/sensor```\
+Next, paste the displayed IP into your desired browser, followed by /sensor, so for example
+
+```127.0.0.1/sensor```
+
 will display the three sensors, their current moisture level, their optimal moisture level, and hours since they were last watered.
 
 **The LED strip displays the plant's current moisture level:**
