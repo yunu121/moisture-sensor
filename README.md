@@ -42,10 +42,13 @@ Make sure to calibrate the values by testing and recording both upper and lower 
 Using the ESP32 as a Moisture Sensor
 ------------------------------------
 After the second flash is complete, the ESP32 monitor will pop up in the terminal, and if everything is done correctly, you will be able to see messages such as\
+
 ```I (1905) Server: Server running @ 127.0.0.1```\
-```I (1905) Server: Connected to AP -> SSID: ESP32, Password: 12345678```\
+```I (1905) Server: Connected to AP -> SSID: ESP32, Password: 12345678```
+
 Otherwise, something has gone wrong, and you might want to check that [Wi-Fi Configuration](#after-first-time-flash)
-was configured properly (remember everything is case sensitive)!\
+was configured properly (remember everything is case sensitive)!
+
 **Make sure to take note of the IP, as this will be used to access the HTTP server for the plants.**
 
 Next, paste the displayed IP into your desired browser, followed by /sensor, so for example\
