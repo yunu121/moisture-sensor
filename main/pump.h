@@ -4,10 +4,20 @@
     @brief  Methods to configure and drive the water pump.
 */
 
-void configure_pump(void);
-void drive(int seconds);
-
 #ifndef PUMP_H
 #define PUMP_H
+
 #include "driver/gpio.h"
+
+/** Configures water pump as output.
+    @return None
+*/
+void configure_pump(void);
+
+/** Drives pump for a given amount of seconds
+    @param  int seconds the number of seconds to drive pump for.
+    @return None
+*/
+void drive(int seconds);
+
 #endif

@@ -5,44 +5,35 @@
             Can connect to Wi-Fi and displays moisture 
             percentage as a HTML page by accessing 
             <IP-Address>/sensor.
+    @note   This file contains the HTTP server implementations
+            and main logic for the Automated Watering System.
 */
 
-#include <stdio.h>
-#include "sdkconfig.h"
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "esp_log.h"
-#include "led.h"
-#include "server.h"
-#include "sensor.h"
-#include "user_defined.h"
+#include "main.h"
 
-#define S_TO_HOURS_1 3600
-
-/** DECLARATIONS START */
-static const char *SERVER = "Server";
-
-static const char *SENSOR1 = "Moisture Sensor 1";
-static const char *SENSOR2 = "Moisture Sensor 2";
-static const char *SENSOR3 = "Moisture Sensor 3";
-
-static float timers[3] = {0, 0, 0};
-
-
+/*  LED Strip Related Variable Initialisation Start  */
 static uint8_t s_led_state = 0;
 static led_strip_handle_t led_strip;
 led_strip_config_t strip_config;
 led_strip_rmt_config_t rmt_config;
+/*  LED Strip Related Variable Initialisation End  */
+
+/*  Sensor Related Variable Initialisation Start  */
+static const char *SENSOR1 = "Moisture Sensor 1";
+static const char *SENSOR2 = "Moisture Sensor 2";
+static const char *SENSOR3 = "Moisture Sensor 3";
 
 adc_oneshot_unit_handle_t sensor;
 adc_oneshot_unit_init_cfg_t adc_config;
 adc_oneshot_chan_cfg_t config;
+/*  Sensor Related Variable Initialisation End  */
+
+/*  Server Related Variable Initialisation Start  */
+static const char *SERVER = "Server";
 
 static int s_retry_num = 0;
 static EventGroupHandle_t s_wifi_event_group;
 esp_err_t get_req_handler(httpd_req_t *req);
-
-int moisture;
 
 httpd_uri_t uri_get = {
     .uri = "/sensor",
@@ -50,17 +41,13 @@ httpd_uri_t uri_get = {
     .handler = get_req_handler,
     .user_ctx = NULL
 };
-/** DECLARATIONS END */
+/*  Server Related Variable Declarations End  */
 
-/** METHODS START */
+int moisture;
+static float timers[3] = {0, 0, 0};
 
-/** Handles events.
-    @param void *arg the pointer to an argument
-    @param esp_event_base_t event_base the base of the event
-    @param int32_t event_id the id of the event
-    @param void *event_data the pointer to the event data
-    @return None
-*/
+
+/*  Server Related Method Definitions Start  */
 static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data)
 {
     if (event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_START) {
@@ -76,18 +63,16 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
 
     } else if (event_base == IP_EVENT && event_id == IP_EVENT_STA_GOT_IP) {
         ip_event_got_ip_t *event = (ip_event_got_ip_t *)event_data;
+
         ESP_LOGI(SERVER, "Server running @ " IPSTR, IP2STR(&event->ip_info.ip));
         
-        s_retry_num = 0;
+        s_retry_num = 0; // Resets the number of retries
         
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
         xEventGroupSetBits(s_wifi_event_group, WIFI_CONNECTED_BIT);
     }
 }
 
-/** Connects to the Wi-Fi.
-    @return None
-*/
 void connect_wifi(void)
 {
     s_wifi_event_group = xEventGroupCreate();
@@ -143,10 +128,6 @@ void connect_wifi(void)
     vEventGroupDelete(s_wifi_event_group);
 }
 
-/** Sends webpage.
-    @param httpd_req_t *req the pointer to the request
-    @return esp_err_t the error id.
-*/
 esp_err_t send_web_page(httpd_req_t *req)
 {
     char moisture_str[5];
@@ -193,18 +174,11 @@ esp_err_t send_web_page(httpd_req_t *req)
     return response;
 }
 
-/** Gets the request handler.
-    @param httpd_req_t *req the pointer to the request
-    @return esp_err_t the error id.
-*/
 esp_err_t get_req_handler(httpd_req_t *req)
 {
     return send_web_page(req);
 }
 
-/** Sends webpage.
-    @return httpd_handle_t the http server handle.
-*/
 httpd_handle_t setup_server(void)
 {
     httpd_config_t config = HTTPD_DEFAULT_CONFIG();
@@ -216,10 +190,9 @@ httpd_handle_t setup_server(void)
 
     return server;
 }
+/*  Server Related Method Definitions End  */
 
-/** Logs values using ESP_LOGI.
-    @return None
-*/
+/*  Miscellaneous Method Definitions Start  */
 void log_values(void) 
 {
         ESP_LOGI(SENSOR1, "Raw Value = %d", moisture);
@@ -227,9 +200,6 @@ void log_values(void)
         ESP_LOGI(SENSOR1, "Moisture = %d%%", moisture); 
 }
 
-/** Checks timers to see when plants were last watered.
-    @return None
-*/
 void check_timers(void)
 {
     for (int i = 0; i < 3; i++) {
@@ -240,8 +210,7 @@ void check_timers(void)
         timers[i]++;
     }
 }
-
-/** METHODS END */
+/*  Miscellaneous Method Definitions End  */
 
 /** Main function  */
 void app_main(void)
