@@ -37,7 +37,7 @@ After flashing is complete, the ESP32 monitor will pop up in the terminal, and y
 ```I (1905) Server: Server running @ 127.0.0.1```\
 ```I (1905) Server: Connected to AP -> SSID: ESP32, Password: 12345678```\
 if everything is done correctly.\
-Make sure to take note of the IP, as this will be used to read the exact moisture percentage.\
+Make sure to take note of the IP, as this will be used to read the exact moisture percentage.
 
 Next, paste the displayed IP into your desired browser, followed by /sensor, so for example\
 ```127.0.0.1/sensor```\
