@@ -57,3 +57,6 @@ will display the three sensors, their current moisture level, their optimal mois
   - The number of LEDS illuminated displays the current moisture relative to its optimal moisture.
 - A full strip of LEDS flashing in RED indicates that the current moisture level is above the optimal moisture.
 
+Author
+------
+Yunu Cho
