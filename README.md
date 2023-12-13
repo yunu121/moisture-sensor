@@ -35,8 +35,8 @@ Make sure to calibrate the values by testing and recording both upper and lower 
 - Measuring the raw value when the moisture sensor is dry,
 - Measuring the raw value when the moisture sensor is fully wet, i.e submerged in water.
 
-**Then flash again, for a second time.**
-```idf.py -p <serial-port> flash monitor```\
+**Then flash again, for a second time.**\
+```idf.py -p <serial-port> flash monitor```
 
 Using the ESP32 as a Moisture Sensor
 ------------------------------------
