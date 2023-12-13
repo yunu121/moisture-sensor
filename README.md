@@ -50,3 +50,10 @@ Make sure to take note of the IP, as this will be used to read the exact moistur
 Next, paste the displayed IP into your desired browser, followed by /sensor, so for example\
 ```127.0.0.1/sensor```\
 will display the three sensors, their current moisture level, their optimal moisture level, and hours since they were last watered.
+
+**The LED strip displays the plant's current moisture level:**\
+- A single flashing LED in RED indicates that the moisture level is below 25% of its optimal moisture so needs to be watered;
+- A constant LED in GREEN indicates that the moisture level is above 25% of its optimal moisture;
+  - The number of LEDS illuminated displays the current moisture relative to its optimal moisture.
+- A full strip of LEDS flashing in RED indicates that the current moisture level is above the optimal moisture.
+
