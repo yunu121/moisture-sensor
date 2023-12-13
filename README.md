@@ -1,7 +1,7 @@
 sensor: An implementation of an automated plant watering system
 ========================================================================
 **sensor** is an automated plant system with an ESP32 with Wi-Fi, 
-soil moisture sensors, and an LED strip.
+soil moisture sensors, and an LED strip, using ESP-IDF.
 
 Requirements
 ------------
