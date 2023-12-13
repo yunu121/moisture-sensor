@@ -66,8 +66,8 @@ will display the three sensors, their current moisture level, their optimal mois
 **The LED strip displays the plant's current moisture level:**
 - A **single flashing LED in RED** indicates that the moisture level is below 25% of its optimal moisture so needs to be watered;
 - A **constantly illuminated LED in GREEN** indicates that the moisture level is above 25% of its optimal moisture;
-  - *The number of LEDS illuminated displays the current moisture relative to its optimal moisture.*
-- A **full strip of LEDS flashing in RED** indicates that the current moisture level is above the optimal moisture, and should not be watered again (until moisture goes back down to below optimal).
+  - *The number of LEDs illuminated displays the current moisture relative to its optimal moisture.*
+- A **full strip of LEDs flashing in RED** indicates that the current moisture level is above the optimal moisture, and should not be watered again (until moisture goes back down to below optimal).
 
 Author
 ------
