@@ -7,7 +7,8 @@ Requirements
 ------------
 In order to build **sensor** you need all the dependencies for the ESP32 by following [this guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/).
 
-**Clone this repository to your esp directory:**\
+**Clone this repository to your esp directory:**
+
 ```cd /Users/<user>/esp```\
 ```git clone https://github.com/yunu121/sensor.git```
 
@@ -17,11 +18,13 @@ Preparations Before Flashing
 - Refer to the [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) to determine the correct GPIO pins and ADC channels for your exact specifications.
 
 Now open sdkconfig and search for "Wi-Fi Configuration" and edit the following values based
-on your Wi-Fi settings.\
+on your Wi-Fi settings.
+
 ```CONFIG_ESP_WIFI_SSID="ESP32"```\
 ```CONFIG_ESP_WIFI_PASSWORD="12345678"```
 
-**To flash, enter the commands:**\
+**To flash, enter the commands:**
+
 ```idf.py set-target esp32```\
 ```idf.py build```\
 ```idf.py -p <serial-port> flash monitor```
@@ -44,7 +47,7 @@ Make sure to calibrate the values by testing and recording both upper and lower 
 
 Using the ESP32 as a Moisture Sensor
 ------------------------------------
-After the second flash is complete, the ESP32 monitor will pop up in the terminal, and if everything is done correctly, you will be able to see messages such as\
+After the second flash is complete, the ESP32 monitor will pop up in the terminal, and if everything is done correctly, you will be able to see messages such as
 
 ```I (1905) Server: Server running @ 127.0.0.1```\
 ```I (1905) Server: Connected to AP -> SSID: ESP32, Password: 12345678```
