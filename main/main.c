@@ -163,7 +163,7 @@ esp_err_t send_web_page(httpd_req_t *req)
     snprintf(timer_str_3, sizeof(timer_str_3), "%.2f", timers[2] / S_TO_HOURS_1);
 
     const char resp[] = "<style>"
-                        "body {background-color: black; color: white; font-family: helvetica;}"
+                        "body {padding: 25px; background-color: black; color: white; font-family: helvetica;}"
                         "h1, h2, h3 {font-family: helvetica;}"
                         "p {font-family: helvetica;}"
                         ".p1 {font-family: helvetica; font-size: 12px;}"
