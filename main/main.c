@@ -158,9 +158,9 @@ esp_err_t send_web_page(httpd_req_t *req)
 
     snprintf(moisture_str, sizeof(moisture_str), "%d%%", moisture);
     snprintf(optimal_str, sizeof(optimal_str), "%d%%", OPTIMAL_MOISTURE);
-    snprintf(timer_str_1, sizeof(timer_str_1), "%.2f", timers[0]/3600);
-    snprintf(timer_str_2, sizeof(timer_str_2), "%.2f", timers[1]/3600);
-    snprintf(timer_str_3, sizeof(timer_str_3), "%.2f", timers[2]/3600);
+    snprintf(timer_str_1, sizeof(timer_str_1), "%.2f", timers[0] / S_TO_HOURS_1);
+    snprintf(timer_str_2, sizeof(timer_str_2), "%.2f", timers[1] / S_TO_HOURS_1);
+    snprintf(timer_str_3, sizeof(timer_str_3), "%.2f", timers[2] / S_TO_HOURS_1);
 
     const char resp[] = "<style>"
                         "body {background-color: black; color: white; font-family: helvetica;}"

@@ -5,3 +5,12 @@
 */
 
 #include "pump.h"
+
+void configure_pump(void)
+{
+    ;;
+}
+void drive(int seconds)
+{
+    ;;   
+}
