@@ -19,7 +19,7 @@ Make sure to calibrate the values by testing upper and lower bounds of your sens
 - Measuring the raw value when the moisture sensor is dry,
 - Measuring the raw value when the moisture sensor is fully wet, i.e submerged in water.
 
-**These raw values can be seen on the ESP32 monitor.**
+**These raw values can be seen on the [ESP32 monitor](#using-the-esp32-as-a-moisture-sensor).**
 
 Now open sdkconfig and search for "Wi-Fi Configuration" and edit the following values based
 on your Wi-Fi settings.\
