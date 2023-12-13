@@ -16,18 +16,10 @@ Flashing to ESP32
 Open sensor.c and adjust values from lines 22-29 depending on your setup.\
 Make sure to calibrate the values by testing upper and lower bounds.
 
-Now open sdkconfig and search for "Wi-Fi Configuration" and edit these values based
+Now open sdkconfig and search for "Wi-Fi Configuration" and edit the following values based
 on your Wi-Fi settings.
-```
-# Wi-Fi Configuration
-#
-CONFIG_ESP_WIFI_SSID="ESP32"
-CONFIG_ESP_WIFI_PASSWORD="12345678"
-CONFIG_ESP_WIFI_CHANNEL=1
-CONFIG_ESP_MAX_STA_CONN=4
-CONFIG_ESP_MAX_RETRY=5
-# end of Wi-Fi Configuration
-```
+```CONFIG_ESP_WIFI_SSID="ESP32"```\
+```CONFIG_ESP_WIFI_PASSWORD="12345678"```
 
 **Afterwards enter the commands:**\
 ```idf.py set-target esp32```\
