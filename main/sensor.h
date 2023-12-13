@@ -3,6 +3,7 @@
     @date   7 December 2023
     @brief  Declaration of methods for the moisture sensor.
 */
+
 #ifndef SENSOR_H
 #define SENSOR_H
 #include "driver/gpio.h"

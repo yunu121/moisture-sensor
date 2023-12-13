@@ -4,6 +4,7 @@
     @brief  Implementation of a LED strip.
             Can either toggle or blink.
 */
+
 #include "led.h"
 
 void configure_led(gpio_num_t gpio_num, led_strip_config_t *strip_config, led_strip_rmt_config_t *rmt_config, led_strip_handle_t *led_strip)

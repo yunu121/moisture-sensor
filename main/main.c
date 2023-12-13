@@ -15,29 +15,9 @@
 #include "led.h"
 #include "server.h"
 #include "sensor.h"
+#include "user_defined.h"
+
 #define S_TO_HOURS_1 3600
-
-/** USER DEFINED VALUES START */
-//  Change these values based on your setup. Refer to datasheet.
-#define SENSOR_PIN_1 GPIO_NUM_36
-#define SENSOR_UNIT_1 ADC_UNIT_1
-#define SENSOR_CHANNEL_1 ADC_CHANNEL_0
-
-#define SENSOR_PIN_2 0
-#define SENSOR_UNIT_2 0
-#define SENSOR_CHANNEL_2 0
-
-#define SENSOR_PIN_3 0
-#define SENSOR_UNIT_3 0
-#define SENSOR_CHANNEL_3 0
-
-#define LED_STRIP_PIN GPIO_NUM_14
-
-int optimal_moisture = 60;
-
-static int upper_bound = 2990;  //Upper bound for raw input, i.e. when it is dry
-static int lower_bound = 1990;  //Lower bound for raw input, i.e. when it is wet
-/** USER DEFINED VALUES END */
 
 /** DECLARATIONS START */
 static const char *SERVER = "Server";
@@ -177,7 +157,7 @@ esp_err_t send_web_page(httpd_req_t *req)
     esp_err_t response;
 
     snprintf(moisture_str, sizeof(moisture_str), "%d%%", moisture);
-    snprintf(optimal_str, sizeof(optimal_str), "%d%%", optimal_moisture);
+    snprintf(optimal_str, sizeof(optimal_str), "%d%%", OPTIMAL_MOISTURE);
     snprintf(timer_str_1, sizeof(timer_str_1), "%.2f", timers[0]/3600);
     snprintf(timer_str_2, sizeof(timer_str_2), "%.2f", timers[1]/3600);
     snprintf(timer_str_3, sizeof(timer_str_3), "%.2f", timers[2]/3600);
@@ -190,7 +170,7 @@ esp_err_t send_web_page(httpd_req_t *req)
                         "</style>"
 
                         "<h1>Plant Moisture Levels</h1>"
-                        "<p><i>The plants in this planter are all expected to have similar optimal moistures of: %s</i></p>"
+                        "<p class='p1'><i>The plants in this planter are all expected to have similar optimal moistures of: %s</i></p>"
 
                         "<h2>Plant 1</h1>"
                         "<p>Moisture: %s</p>"
@@ -200,7 +180,7 @@ esp_err_t send_web_page(httpd_req_t *req)
                         "<p>Moisture: %s</p>"
                         "<p class='p1'><i>Last watered: %s hrs ago</i></p>"
 
-                        "<h2>Plant 2</h2>"
+                        "<h2>Plant 3</h2>"
                         "<p>Moisture: %s</p>"
                         "<p class='p1'><i>Last watered: %s hrs ago</i></p>";
 
@@ -243,7 +223,7 @@ httpd_handle_t setup_server(void)
 void log_values(void) 
 {
         ESP_LOGI(SENSOR1, "Raw Value = %d", moisture);
-        moisture = ((moisture - lower_bound) * (0 - optimal_moisture)) / (upper_bound - lower_bound) + optimal_moisture;
+        moisture = ((moisture - LOWER_BOUND) * (0 - OPTIMAL_MOISTURE)) / (UPPER_BOUND - LOWER_BOUND) + OPTIMAL_MOISTURE;
         ESP_LOGI(SENSOR1, "Moisture = %d%%", moisture); 
 }
 
@@ -287,7 +267,7 @@ void app_main(void)
         
         if (moisture < 25) {
             blink_led(1, s_led_state, led_strip);
-        } else if (moisture > optimal_moisture) {
+        } else if (moisture > OPTIMAL_MOISTURE) {
             blink_led(4, s_led_state, led_strip);
         } else {   
             int index = moisture / 25;

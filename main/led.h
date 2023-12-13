@@ -3,6 +3,7 @@
     @date   7 December 2023
     @brief  Declarations of methods for the LED module.
 */
+
 #ifndef LED_H
 #define LED_H
 
