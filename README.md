@@ -72,7 +72,10 @@ will display the three sensors, their current moisture level, their optimal mois
 Modifications
 -------------
 Modifications will need to be made to work for a specific setup. The pump module ([pump.c](https://github.com/yunu121/sensor/blob/main/main/pump.c) and [pump.h](https://github.com/yunu121/sensor/blob/main/main/pump.h)) has been **intentionally left blank (with a few code snippets that may be helpful) and is up to your own interpretation**, depending on what your setup is. I recommend using a 5v brushless water pump with a relay or MOSFET board.\
-The number of maximum sensors is defined as 1 by default, but can be modified to accomodate more sensors, up to three in [user_defined.h](https://github.com/yunu121/sensor/blob/main/main/user_defined.h).
+The number of maximum sensors is defined as 1 by default, but can be modified to accomodate more sensors, up to three in [user_defined.h](https://github.com/yunu121/sensor/blob/main/main/user_defined.h).\
+**Note: If you don't want to attach a water pump, the only functionality would be viewing the plant status on the LED strip and on the HTTP server, and watering would have to be done manually.**
+
+
 
 
 Author
