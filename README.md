@@ -69,6 +69,12 @@ will display the three sensors, their current moisture level, their optimal mois
   - *The number of LEDs illuminated displays the current moisture relative to its optimal moisture.*
 - A **full strip of LEDs flashing in RED** indicates that the current moisture level is above the optimal moisture, and should not be watered again (until moisture goes back down to below optimal).
 
+Modifications
+-------------
+Modifications will need to be made to work for a specific setup. The pump module ([pump.c](https://github.com/yunu121/sensor/blob/main/main/pump.c) and [pump.h](https://github.com/yunu121/sensor/blob/main/main/pump.h)) has been **intentionally left blank (with a few code snippets that may be helpful) and is up to your own interpretation**, depending on what your setup is. I recommend using a 5v brushless water pump with a relay or MOSFET board.\
+The number of maximum sensors is defined as 1 by default, but can be modified to accomodate more sensors, up to three in [user_defined.h](https://github.com/yunu121/sensor/blob/main/main/user_defined.h).
+
+
 Author
 ------
 Yunu Cho
