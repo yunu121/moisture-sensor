@@ -14,7 +14,7 @@ In order to build **sensor** you need all the dependencies for the ESP32 by foll
 
 Preparations Before Flashing
 ----------------------------
-**Open [user_defined.h](https://github.com/yunu121/sensor/blob/main/main/user_defined.h) and adjust macros depending on your setup.**
+**Open [user_config.h](https://github.com/yunu121/sensor/blob/main/main/user_config.h) and adjust macros depending on your setup.**
 - Refer to the [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) to determine the correct GPIO pins and ADC channels for your exact specifications.
 
 Now open sdkconfig and search for "Wi-Fi Configuration" and edit the following values based
@@ -35,7 +35,7 @@ After First-Time Flash
 ----------------------
 After running the commands shown in the above section, you will be able to see the ESP32 monitor in your terminal.\
 This is particularly useful as you will be able to calibrate the sensors based on the raw input displayed.
-Make sure to calibrate the values by testing and recording both upper and lower bounds of your sensors, in [user_defined.h](https://github.com/yunu121/sensor/blob/main/main/user_defined.h).
+Make sure to calibrate the values by testing and recording both upper and lower bounds of your sensors, in [user_config.h](https://github.com/yunu121/sensor/blob/main/main/user_config.h).
 
 **This can be done by:**
 - Measuring the raw value when the moisture sensor is dry,
