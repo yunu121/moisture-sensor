@@ -1,25 +1,51 @@
+/** @file   main.h
+    @author Yunu Cho
+    @date   14 December 2023
+    @brief  Declarations of methods for the moisture sensor. 
+*/
 
 #ifndef MAIN_H
 #define MAIN_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h> 
 #include "sdkconfig.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
-#include "led.h"
-#include "server.h"
-#include "sensor.h"
-#include "user_defined.h"
+#include "esp_system.h"
 
+#include <esp_http_server.h>
+#include "esp_wifi.h"
+#include "esp_event.h"
+#include "freertos/event_groups.h"
+#include "nvs_flash.h"
+#include "esp_netif.h"
+#include <lwip/sockets.h>
+#include <lwip/sys.h>
+#include <lwip/api.h>
+#include <lwip/netdb.h>
+
+#include "led.h"
+#include "sensor.h"
+#include "user_config.h"
+
+#ifdef PUMP_ENABLED
+    #include "pump.h"
+#endif
+
+#define HTTP_QUERY_MAX_LEN 64
+#define WIFI_CONNECTED_BIT BIT0
+#define WIFI_FAIL_BIT BIT1
 
 #define S_TO_HOURS_1 3600
 
 /** Handles HTTP server events.
-    @param  void                *arg the pointer to an argument
-    @param  esp_event_base_t    event_base the base of the event
-    @param  int32_t             event_id the id of the event
-    @param  void                *event_data the pointer to the event data
+    @param  *arg        the pointer to an argument
+    @param  event_base  the base of the event
+    @param  event_id    the id of the event
+    @param  *event_data the pointer to the event data
     @return None
 */
 static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
@@ -30,19 +56,19 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
 void connect_wifi(void);
 
 /** Sends webpage.
-    @param  httpd_req_t *req the pointer to the request
-    @return esp_err_t the error id.
+    @param  *req the pointer to the request
+    @return The error ID.
 */
 esp_err_t send_web_page(httpd_req_t *req);
 
 /** Gets the request handler.
-    @param  httpd_req_t *req the pointer to the request
-    @return esp_err_t the error id.
+    @param  *req the pointer to the request
+    @return The error ID.
 */
 esp_err_t get_req_handler(httpd_req_t *req);
 
 /** Sends webpage.
-    @return httpd_handle_t the http server handle.
+    @return The HTTP server handle.
 */
 httpd_handle_t setup_server(void);
 

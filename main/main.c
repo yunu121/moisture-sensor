@@ -12,16 +12,24 @@
 #include "main.h"
 
 /*  LED Strip Related Variable Initialisation Start  */
-static uint8_t s_led_state = 0;
 static led_strip_handle_t led_strip;
 led_strip_config_t strip_config;
 led_strip_rmt_config_t rmt_config;
+static uint8_t s_led_state = 0;
 /*  LED Strip Related Variable Initialisation End  */
 
 /*  Sensor Related Variable Initialisation Start  */
-static const char *SENSOR1 = "Moisture Sensor 1";
-static const char *SENSOR2 = "Moisture Sensor 2";
-static const char *SENSOR3 = "Moisture Sensor 3";
+#ifdef SENSOR_1
+    static const char *SENSOR1 = "Moisture Sensor 1";
+#endif
+
+#ifdef SENSOR_2
+    static const char *SENSOR2 = "Moisture Sensor 2";
+#endif
+
+#ifdef SENSOR_3
+    static const char *SENSOR3 = "Moisture Sensor 3";
+#endif
 
 adc_oneshot_unit_handle_t sensor;
 adc_oneshot_unit_init_cfg_t adc_config;
@@ -43,7 +51,9 @@ httpd_uri_t uri_get = {
 };
 /*  Server Related Variable Declarations End  */
 
-int moisture;
+int raw_value;
+float moisture;
+float relative_moisture;
 static float timers[3] = {0, 0, 0};
 
 
@@ -80,9 +90,11 @@ void connect_wifi(void)
     ESP_ERROR_CHECK(esp_netif_init());
 
     ESP_ERROR_CHECK(esp_event_loop_create_default());
+    
     esp_netif_create_default_wifi_sta();
 
     wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+    
     ESP_ERROR_CHECK(esp_wifi_init(&cfg));
 
     esp_event_handler_instance_t instance_any_id;
@@ -130,14 +142,15 @@ void connect_wifi(void)
 
 esp_err_t send_web_page(httpd_req_t *req)
 {
-    char moisture_str[5];
+    char moisture_str[6];
     char optimal_str[5];
     char timer_str_1[5];
     char timer_str_2[5];
     char timer_str_3[5];
+
     esp_err_t response;
 
-    snprintf(moisture_str, sizeof(moisture_str), "%d%%", moisture);
+    snprintf(moisture_str, sizeof(moisture_str), "%.1f%%", moisture);
     snprintf(optimal_str, sizeof(optimal_str), "%d%%", OPTIMAL_MOISTURE);
     snprintf(timer_str_1, sizeof(timer_str_1), "%.2f", timers[0] / S_TO_HOURS_1);
     snprintf(timer_str_2, sizeof(timer_str_2), "%.2f", timers[1] / S_TO_HOURS_1);
@@ -195,24 +208,32 @@ httpd_handle_t setup_server(void)
 /*  Miscellaneous Method Definitions Start  */
 void log_values(void) 
 {
-        ESP_LOGI(SENSOR1, "Raw Value = %d", moisture);
-        moisture = ((moisture - LOWER_BOUND) * (0 - OPTIMAL_MOISTURE)) / (UPPER_BOUND - LOWER_BOUND) + OPTIMAL_MOISTURE;
-        ESP_LOGI(SENSOR1, "Moisture = %d%%", moisture); 
+    ESP_LOGI(SENSOR1, "Raw Value = %d", raw_value);
+
+    moisture = ((float)(raw_value) - UPPER_BOUND) / (LOWER_BOUND - UPPER_BOUND) * 100;
+    relative_moisture = (moisture / OPTIMAL_MOISTURE) * 100;
+    
+    ESP_LOGI(SENSOR1, "Moisture = %.1f%%", moisture); 
+    ESP_LOGI(SENSOR1, "Relative Moisture = %.1f%%", relative_moisture); 
 }
 
 void check_timers(void)
 {
     for (int i = 0; i < 3; i++) {
-        if (timers[i] >= S_TO_HOURS_1) {
-            //water
-            timers[i] = 0;
+        if (timers[i] >= S_TO_HOURS_1) { // Checks if plants haven't been watered in the last hour
+            #ifdef PUMP_ENABLED
+                float volume = calculate_volume(SOIL_VOLUME, moisture, OPTIMAL_MOISTURE);
+                int seconds = calculate_duration(volume, FLOW_RATE);
+                drive(seconds);
+                timers[i] = 0;
+            #endif
         }
         timers[i]++;
     }
 }
 /*  Miscellaneous Method Definitions End  */
 
-/** Main function  */
+/*  Main function  */
 void app_main(void)
 {
     esp_err_t ret = nvs_flash_init();
@@ -228,22 +249,23 @@ void app_main(void)
     setup_server();
 
     configure_sensor(SENSOR_PIN_1, SENSOR_CHANNEL_1, &adc_config, &config, &sensor);
-    configure_led(LED_STRIP_PIN, &strip_config, &rmt_config, &led_strip);
+    configure_led(LED_STRIP_PIN, &strip_config, &rmt_config, &led_strip, MAX_LEDS);
     
     while (1) {
-        read_sensor(sensor, ADC_CHANNEL_0, &moisture);
+        read_sensor(sensor, ADC_CHANNEL_0, &raw_value);
         log_values();
         
-        if (moisture < 25) {
+        if (relative_moisture < 25) {
             blink_led(1, s_led_state, led_strip);
-        } else if (moisture > OPTIMAL_MOISTURE) {
-            blink_led(4, s_led_state, led_strip);
+        } else if (moisture > OPTIMAL_MOISTURE + 10) {
+            blink_led(MAX_LEDS, s_led_state, led_strip);
         } else {   
-            int index = moisture / 25;
+            int index = relative_moisture / 25;
             toggle_led(index, led_strip);
         }
 
         s_led_state = !s_led_state;
+        
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         check_timers();
     }
