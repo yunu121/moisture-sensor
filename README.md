@@ -1,20 +1,20 @@
-sensor: An implementation of an automated plant watering system
+moisture-sensor: An implementation of an automated plant watering system
 ========================================================================
-**sensor** is an automated plant system with an ESP32 with Wi-Fi, 
+**moisture-sensor** is an automated plant system with an ESP32 with Wi-Fi, 
 soil moisture sensors, and an LED strip, using ESP-IDF.
 
 Requirements
 ------------
-In order to build **sensor** you need all the dependencies for the ESP32 by following [this guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/).
+In order to build **moisture-sensor** you need all the dependencies for the ESP32 by following [this guide](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/).
 
 **Clone this repository to your esp directory:**
 
 ```cd /Users/<user>/esp```\
-```git clone https://github.com/yunu121/sensor.git```
+```git clone https://github.com/yunu121/moisture-sensor.git```
 
 Preparations Before Flashing
 ----------------------------
-**Open [user_config.h](https://github.com/yunu121/sensor/blob/main/main/user_config.h) and adjust macros depending on your setup.**
+**Open [user_config.h](https://github.com/yunu121/moisture-sensor/blob/main/main/user_config.h) and adjust macros depending on your setup.**
 - Refer to the [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) to determine the correct GPIO pins and ADC channels for your exact specifications.
 
 Now open sdkconfig and search for "Wi-Fi Configuration" and edit the following values based
@@ -35,7 +35,7 @@ After First-Time Flash
 ----------------------
 After running the commands shown in the above section, you will be able to see the ESP32 monitor in your terminal.\
 This is particularly useful as you will be able to calibrate the sensors based on the raw input displayed.
-Make sure to calibrate the values by testing and recording both upper and lower bounds of your sensors, in [user_config.h](https://github.com/yunu121/sensor/blob/main/main/user_config.h).
+Make sure to calibrate the values by testing and recording both upper and lower bounds of your sensors, in [user_config.h](https://github.com/yunu121/moisture-sensor/blob/main/main/user_config.h).
 
 **This can be done by:**
 - Measuring the raw value when the moisture sensor is dry,
@@ -71,8 +71,8 @@ will display the three sensors, their current moisture level, their optimal mois
 
 Modifications
 -------------
-Modifications will need to be made to work for a specific setup. The pump module ([pump.c](https://github.com/yunu121/sensor/blob/main/main/pump.c) and [pump.h](https://github.com/yunu121/sensor/blob/main/main/pump.h)) has been **intentionally left blank (with a few code snippets that may be helpful) and is up to your own interpretation**, depending on what your setup is. I recommend using a 5v brushless water pump with a relay or MOSFET board.\
-The number of maximum sensors is defined as 1 by default, but can be modified to accomodate more sensors, up to three in [user_config.h](https://github.com/yunu121/sensor/blob/main/main/user_config.h).\
+Modifications will need to be made to work for a specific setup. The pump module ([pump.c](https://github.com/yunu121/moisture-sensor/blob/main/main/pump.c) and [pump.h](https://github.com/yunu121/moisture-sensor/blob/main/main/pump.h)) has been **intentionally left blank (with a few code snippets that may be helpful) and is up to your own interpretation**, depending on what your setup is. I recommend using a 5v brushless water pump with a relay or MOSFET board.\
+The number of maximum sensors is defined as 1 by default, but can be modified to accomodate more sensors, up to three in [user_config.h](https://github.com/yunu121/moisture-sensor/blob/main/main/user_config.h).\
 **Note: If you don't want to attach a water pump, the only functionality would be viewing the plant status on the LED strip and on the HTTP server, and watering would have to be done manually.**
 
 
