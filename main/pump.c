@@ -7,9 +7,10 @@
 
 #include "pump.h"
 
-void configure_pump(void)
+void configure_pump(uint64_t gpio)
 {
-    ;;
+    gpio_set_direction(gpio, GPIO_MODE_OUTPUT);
+    gpio_set_pull_mode(gpio, GPIO_PULLUP_ONLY);
 }
 
 float calculate_volume(int soil_volume, float moisture, int optimal_moisture)
@@ -24,7 +25,9 @@ int calculate_duration(float volume, float flow)
     return (volume / flow) * 3600;
 }
 
-void drive(int seconds)
+void drive(uint63_t gpio, int seconds)
 {
-    
+    gpio_set_level(gpio, 1);
+    vTaskDelay((seconds * 1000) / pdTICKS_TO_MS);
+    gpio_set_level(gpio, 0);
 }

@@ -9,12 +9,13 @@
 #define USER_CONFIG_H
 
 /*  GPIO and ADC Setup Macros Start  */
+/** @note Sensor 1 is enabled by default!  */
 #define SENSOR_1
 #define SENSOR_PIN_1 GPIO_NUM_36
 #define SENSOR_UNIT_1 ADC_UNIT_1
 #define SENSOR_CHANNEL_1 ADC_CHANNEL_0
 
-/** @note Uncomment the below line and configure macros if more sensors are to be added.  */ 
+/** @note Uncomment the below line and configure macros if sensor 2 is used  */ 
 // #define SENSOR_2
 #ifdef SENSOR_2
     #define SENSOR_PIN_2 0
@@ -22,7 +23,7 @@
     #define SENSOR_CHANNEL_2 0
 #endif
 
-/** @note Uncomment the below line and configure macros if more sensors are to be added.  */ 
+/** @note Uncomment the below line and configure macros if sensor 3 is used.  */ 
 // #define SENSOR_3
 #ifdef SENSOR_3
     #define SENSOR_PIN_3 0
@@ -30,7 +31,8 @@
     #define SENSOR_CHANNEL_3 0
 #endif
 
-/** @note Uncomment the below line and configure macros if pump(s) are to be added.  */ 
+/** @note Uncomment the below line and configure macros if pump(s) are to be used.
+          When PUMP_ENABLED is defined, PUMP_1 is defined automatically.  */ 
 // #define PUMP_ENABLED
 #ifdef PUMP_ENABLED
 

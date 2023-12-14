@@ -9,11 +9,14 @@
 #define PUMP_H
 
 #include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 /** Configures water pump as output.
+    @param  gpio the GPIO port to set as output.
     @return None
 */
-void configure_pump(void);
+void configure_pump(uint64_t gpio);
 
 /** Calculates the volume of water needed to reach optimal moisture
     for a given soil volume.
@@ -32,9 +35,9 @@ float calculate_volume(int soil_volume, float moisture, int optimal_moisture);
 int calculate_duration(float volume, float flow);
 
 /** Drives pump for a given amount of seconds.
-    @param  int seconds the number of seconds to drive pump for.
+    @param  seconds the number of seconds to drive pump for.
     @return None
 */
-void drive(int seconds);
+void drive(uint64_t gpio, int seconds);
 
 #endif

@@ -21,20 +21,31 @@ static uint8_t s_led_state = 0;
 /*  Sensor Related Variable Initialisation Start  */
 #ifdef SENSOR_1
     static const char *SENSOR1 = "Moisture Sensor 1";
+    adc_oneshot_unit_handle_t sensor;
+    adc_oneshot_unit_init_cfg_t adc_config;
+    adc_oneshot_chan_cfg_t config;
 #endif
 
 #ifdef SENSOR_2
     static const char *SENSOR2 = "Moisture Sensor 2";
+    adc_oneshot_unit_handle_t sensor_2;
+    adc_oneshot_unit_init_cfg_t adc_config_2;
+    adc_oneshot_chan_cfg_t config_2;
 #endif
 
 #ifdef SENSOR_3
     static const char *SENSOR3 = "Moisture Sensor 3";
+    adc_oneshot_unit_handle_t sensor_3;
+    adc_oneshot_unit_init_cfg_t adc_config_3;
+    adc_oneshot_chan_cfg_t config_3;
 #endif
 
-adc_oneshot_unit_handle_t sensor;
-adc_oneshot_unit_init_cfg_t adc_config;
-adc_oneshot_chan_cfg_t config;
 /*  Sensor Related Variable Initialisation End  */
+
+/*  Pump Related Variable Initialisation Start  */
+#ifdef PUMP_ENABLED
+#endif
+/*  Pump Related Variable Initialisation End  */
 
 /*  Server Related Variable Initialisation Start  */
 static const char *SERVER = "Server";
@@ -224,7 +235,13 @@ void check_timers(void)
             #ifdef PUMP_ENABLED
                 float volume = calculate_volume(SOIL_VOLUME, moisture, OPTIMAL_MOISTURE);
                 int seconds = calculate_duration(volume, FLOW_RATE);
-                drive(seconds);
+                drive(gpio, seconds);
+                #ifndef PUMP_2
+                    drive(gpio, seconds);
+                #endif
+                #ifndef PUMP_3
+                    drive(gpio, seconds);
+                #endif
                 timers[i] = 0;
             #endif
         }
@@ -248,7 +265,16 @@ void app_main(void)
     connect_wifi();
     setup_server();
 
-    configure_sensor(SENSOR_PIN_1, SENSOR_CHANNEL_1, &adc_config, &config, &sensor);
+    configure_sensor(SENSOR_PIN_1, SENSOR_CHANNEL_1, &adc_config, &config, &sensor); // Sensor 1 is enabled by default
+   
+    #ifdef SENSOR_2
+        configure_sensor(SENSOR_PIN_2, SENSOR_CHANNEL_2, &adc_config_2, &config_2, &sensor_2);
+    #endif
+
+    #ifdef SENSOR_3
+        configure_sensor(SENSOR_PIN_3, SENSOR_CHANNEL_3, &adc_config_3, &config_3, &sensor_3);
+    #endif
+    
     configure_led(LED_STRIP_PIN, &strip_config, &rmt_config, &led_strip, MAX_LEDS);
     
     while (1) {
