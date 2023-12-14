@@ -12,7 +12,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-/** Configures water pump as output.
+/** Configures water pump as output with pullup.
     @param  gpio the GPIO port to set as output.
     @return None
 */
