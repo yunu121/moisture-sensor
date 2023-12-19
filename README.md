@@ -14,9 +14,9 @@ In order to build **moisture-sensor** you need all the dependencies for the ESP3
 
 Preparations Before Flashing
 ----------------------------
-**Open [user_config.h](https://github.com/yunu121/moisture-sensor/blob/main/main/user_config.h) and adjust macros depending on your setup.**
-- Refer to the [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) to determine the correct GPIO pins and ADC channels for your exact specifications.
-- **Note: Use ADC1 for analog readings!**
+**Open [user_config.h](https://github.com/yunu121/moisture-sensor/blob/main/main/user_config.h) and reassign GPIO pin values depending on your setup.**
+- Refer to the [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) to determine the correct GPIO pins and corresponding ADC channels for your exact specifications.
+- **Note: Use ADC1 for analog readings, and make sure they are all on the same unit (ADC1)!**
 
 Now open sdkconfig and search for "Wi-Fi Configuration" and edit the following values based
 on your Wi-Fi settings.
@@ -73,7 +73,7 @@ will display the three sensors, their current moisture level, their optimal mois
 Modifications
 -------------
 Modifications will need to be made to work for a specific setup. The pump module ([pump.c](https://github.com/yunu121/moisture-sensor/blob/main/main/pump.c) and [pump.h](https://github.com/yunu121/moisture-sensor/blob/main/main/pump.h)) has been **intentionally left blank (with a few code snippets that may be helpful) and is up to your own interpretation**, depending on what your setup is. I recommend using a 5v brushless water pump with a relay or MOSFET board.\
-The number of maximum sensors is defined as 1 by default, but can be modified to accomodate more sensors, up to three in [user_config.h](https://github.com/yunu121/moisture-sensor/blob/main/main/user_config.h).\
+The number of maximum sensors is defined as 1 by default, but can be modified to accomodate more sensors, up to a maximum of three in [user_config.h](https://github.com/yunu121/moisture-sensor/blob/main/main/user_config.h).\
 **Note: If you don't want to attach a water pump, the only functionality would be viewing the plant status on the LED strip and on the HTTP server, and watering would have to be done manually.**
 
 
