@@ -11,19 +11,22 @@
 #include "esp_adc/adc_oneshot.h"
 
 /** Configures the sensor.
-    @param  adc_pin     the pin that is connected to the sensor
-    @param  channel     the channel of the used pin
-    @param  *adc_config pointer to initial ADC configuration
-    @param  *config     pointer to ADC configuration
-    @param  *sensor     the pointer to the handle for the sensor
+    @param  adc_pin    the pin that is connected to the sensor
+    @param  unit       the ADC unit for the sensor
+    @param  channel    the channel of the used pin
+    @param  adc_config pointer to initial ADC configuration
+    @param  config     pointer to ADC configuration
+    @param  sensor     the pointer to the handle for the sensor
     @return None
 */
-void configure_sensor(gpio_num_t adc_pin, adc_channel_t channel, adc_oneshot_unit_init_cfg_t *adc_config, adc_oneshot_chan_cfg_t *config, adc_oneshot_unit_handle_t *sensor);
+void configure_unit(adc_unit_t unit, adc_oneshot_unit_init_cfg_t *adc_config, adc_oneshot_unit_handle_t *sensor);
+
+void configure_channel(adc_channel_t channel, adc_oneshot_unit_handle_t *sensor, adc_oneshot_chan_cfg_t *config);
 
 /** Reads from the sensor.
-    @param  *sensor the pointer to the handle for the sensor
+    @param  sensor  the pointer to the handle for the sensor
     @param  channel the pin that is connected to the sensor
-    @param  *out the pointer to the moisture integer, i.e. the variable that the reading will be stored in
+    @param  out     the pointer to the moisture integer, i.e. the variable that the reading will be stored in
     @return None
 */
 void read_sensor(adc_oneshot_unit_handle_t sensor, adc_channel_t channel, int *out);

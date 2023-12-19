@@ -72,7 +72,21 @@ esp_err_t get_req_handler(httpd_req_t *req);
 */
 httpd_handle_t setup_server(void);
 
+/** Calculates moisture value and relative moisture (relative to optimal moisture).
+    This is based on the upper and lower bounds defined by the user.
+    @param  sensor the sensor number
+    @param  raw_value the raw input value 
+    @param  moisture the pointer to the moisture value
+    @param  relative_moisture the pointer to the relative moisture value
+    @return None
+*/
+void calculate_values(int sensor, float raw_value, float *moisture, float *relative_moisture);
+
 /** Logs values using ESP_LOGI.
+    The values logged include:
+     -- The raw input value, which can be used for calibration purposes;
+     -- The moisture value, which was calculated by the calculate_values() method;
+     -- The relative moisture value, which was also calculated by the above method.
     @return None
 */
 void log_values(void);

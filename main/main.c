@@ -12,32 +12,53 @@
 #include "main.h"
 
 /*  LED Strip Related Variable Initialisation Start  */
-static led_strip_handle_t led_strip;
-led_strip_config_t strip_config;
-led_strip_rmt_config_t rmt_config;
-static uint8_t s_led_state = 0;
+#ifdef SENSOR_1
+    static led_strip_handle_t led_strip_1;
+    led_strip_config_t strip_config_1;
+    led_strip_rmt_config_t rmt_config_1;
+    static int s_led_state_1 = 0;
+#endif
+
+#ifdef SENSOR_2
+    static led_strip_handle_t led_strip_2;
+    led_strip_config_t strip_config_2;
+    led_strip_rmt_config_t rmt_config_2;
+    static int s_led_state_2 = 0;
+#endif
+
+#ifdef SENSOR_3
+    static led_strip_handle_t led_strip_3;
+    led_strip_config_t strip_config_3;
+    led_strip_rmt_config_t rmt_config_3;
+    static int s_led_state_3 = 0;
+#endif
 /*  LED Strip Related Variable Initialisation End  */
 
 /*  Sensor Related Variable Initialisation Start  */
 #ifdef SENSOR_1
     static const char *SENSOR1 = "Moisture Sensor 1";
-    adc_oneshot_unit_handle_t sensor;
+    adc_oneshot_unit_handle_t sensor_config;
     adc_oneshot_unit_init_cfg_t adc_config;
-    adc_oneshot_chan_cfg_t config;
+    adc_oneshot_chan_cfg_t config_1;
+    int raw_value_1;
+    float moisture_1;
+    float relative_moisture_1;
 #endif
 
 #ifdef SENSOR_2
     static const char *SENSOR2 = "Moisture Sensor 2";
-    adc_oneshot_unit_handle_t sensor_2;
-    adc_oneshot_unit_init_cfg_t adc_config_2;
     adc_oneshot_chan_cfg_t config_2;
+    int raw_value_2;
+    float moisture_2;
+    float relative_moisture_2;
 #endif
 
 #ifdef SENSOR_3
     static const char *SENSOR3 = "Moisture Sensor 3";
-    adc_oneshot_unit_handle_t sensor_3;
-    adc_oneshot_unit_init_cfg_t adc_config_3;
     adc_oneshot_chan_cfg_t config_3;
+    int raw_value_3;
+    float moisture_3;
+    float relative_moisture_3;
 #endif
 
 /*  Sensor Related Variable Initialisation End  */
@@ -62,9 +83,6 @@ httpd_uri_t uri_get = {
 };
 /*  Server Related Variable Declarations End  */
 
-int raw_value;
-float moisture;
-float relative_moisture;
 static float timers[3] = {0, 0, 0};
 
 
@@ -153,15 +171,29 @@ void connect_wifi(void)
 
 esp_err_t send_web_page(httpd_req_t *req)
 {
-    char moisture_str[6];
-    char optimal_str[5];
+    char moisture_str_1[6];
+    char moisture_str_2[6];
+    char moisture_str_3[6];
+    char optimal_str[6];
     char timer_str_1[5];
     char timer_str_2[5];
     char timer_str_3[5];
 
     esp_err_t response;
 
-    snprintf(moisture_str, sizeof(moisture_str), "%.1f%%", moisture);
+    snprintf(moisture_str_1, sizeof(moisture_str_1), "%.1f%%", moisture_1);
+    #ifdef SENSOR_2
+        snprintf(moisture_str_2, sizeof(moisture_str_2), "%.1f%%", moisture_2);
+    #else
+        snprintf(moisture_str_2, sizeof(moisture_str_2), "%.1f%%", 0.0);
+    #endif
+
+    #ifdef SENSOR_3
+        snprintf(moisture_str_3, sizeof(moisture_str_3), "%.1f%%", moisture_3);
+    #else
+        snprintf(moisture_str_2, sizeof(moisture_str_3), "%.1f%%", 0.0);
+    #endif
+
     snprintf(optimal_str, sizeof(optimal_str), "%d%%", OPTIMAL_MOISTURE);
     snprintf(timer_str_1, sizeof(timer_str_1), "%.2f", timers[0] / S_TO_HOURS_1);
     snprintf(timer_str_2, sizeof(timer_str_2), "%.2f", timers[1] / S_TO_HOURS_1);
@@ -189,9 +221,9 @@ esp_err_t send_web_page(httpd_req_t *req)
                         "<p>Moisture: %s</p>"
                         "<p class='p1'><i>Last watered: %s hrs ago</i></p>";
 
-    char html_response[sizeof(resp) + sizeof(moisture_str) + sizeof(optimal_str) + sizeof(timer_str_1) + sizeof(timer_str_2) + sizeof(timer_str_3)];
+    char html_response[sizeof(resp) + (sizeof(moisture_str_1) * 4) + (sizeof(timer_str_1) * 3)];
 
-    snprintf(html_response, sizeof(html_response), resp, optimal_str, moisture_str, timer_str_1, moisture_str, timer_str_2, moisture_str, timer_str_3);
+    snprintf(html_response, sizeof(html_response), resp, optimal_str, moisture_str_1, timer_str_1, moisture_str_2, timer_str_2, moisture_str_3, timer_str_3);
 
     response = httpd_resp_send(req, html_response, HTTPD_RESP_USE_STRLEN);
     
@@ -217,15 +249,49 @@ httpd_handle_t setup_server(void)
 /*  Server Related Method Definitions End  */
 
 /*  Miscellaneous Method Definitions Start  */
+
+void calculate_values(int sensor, float raw_value, float *moisture, float *relative_moisture)
+{
+    int upper;
+    int lower;
+    switch (sensor) {
+        case 1: upper = UPPER_BOUND_1; lower = LOWER_BOUND_1; break;
+        case 2: 
+            #ifdef SENSOR_2 
+                upper = UPPER_BOUND_2; lower = LOWER_BOUND_2; 
+            #endif 
+            break;
+        case 3: 
+            #ifdef SENSOR_3
+                upper = UPPER_BOUND_3; lower = LOWER_BOUND_3;
+            #endif
+            break;
+        default: upper = UPPER_BOUND_1; lower = LOWER_BOUND_1;
+    }
+    *moisture = ((float)(raw_value) - upper) / (lower - upper) * 100;
+    *relative_moisture = ((*moisture) / OPTIMAL_MOISTURE) * 100;
+}
+
 void log_values(void) 
 {
-    ESP_LOGI(SENSOR1, "Raw Value = %d", raw_value);
-
-    moisture = ((float)(raw_value) - UPPER_BOUND) / (LOWER_BOUND - UPPER_BOUND) * 100;
-    relative_moisture = (moisture / OPTIMAL_MOISTURE) * 100;
+    ESP_LOGI(SENSOR1, "Raw Value = %d", raw_value_1);   
+    calculate_values(1, raw_value_1, &moisture_1, &relative_moisture_1); 
+    ESP_LOGI(SENSOR1, "Moisture = %.1f%%", moisture_1); 
+    ESP_LOGI(SENSOR1, "Relative Moisture = %.1f%%", relative_moisture_1); 
     
-    ESP_LOGI(SENSOR1, "Moisture = %.1f%%", moisture); 
-    ESP_LOGI(SENSOR1, "Relative Moisture = %.1f%%", relative_moisture); 
+    #ifdef SENSOR_2
+        ESP_LOGI(SENSOR2, "Raw Value = %d", raw_value_2);   
+        calculate_values(2, raw_value_2, &moisture_2, &relative_moisture_2); 
+        ESP_LOGI(SENSOR2, "Moisture = %.1f%%", moisture_2); 
+        ESP_LOGI(SENSOR2, "Relative Moisture = %.1f%%", relative_moisture_2); 
+    #endif
+
+    #ifdef SENSOR_3
+        ESP_LOGI(SENSOR3, "Raw Value = %d", raw_value_3);   
+        calculate_values(3, raw_value_3, &moisture_3, &relative_moisture_3); 
+        ESP_LOGI(SENSOR3, "Moisture = %.1f%%", moisture_3); 
+        ESP_LOGI(SENSOR3, "Relative Moisture = %.1f%%", relative_moisture_3); 
+    #endif
 }
 
 void check_timers(void)
@@ -265,32 +331,34 @@ void app_main(void)
     connect_wifi();
     setup_server();
 
-    configure_sensor(SENSOR_PIN_1, SENSOR_CHANNEL_1, &adc_config, &config, &sensor); // Sensor 1 is enabled by default
+    configure_unit(SENSOR_UNIT_1, &adc_config, &sensor_config); // Sensor 1 is enabled by default
+    configure_channel(SENSOR_CHANNEL_1, &sensor_config, &config_1);
+    configure_led(LED_STRIP_PIN_1, &strip_config_1, &rmt_config_1, &led_strip_1, MAX_LEDS);
    
     #ifdef SENSOR_2
-        configure_sensor(SENSOR_PIN_2, SENSOR_CHANNEL_2, &adc_config_2, &config_2, &sensor_2);
+        configure_channel(SENSOR_CHANNEL_2, &sensor_config, &config_2);
+        configure_led(LED_STRIP_PIN_2, &strip_config_2, &rmt_config_2, &led_strip_2, MAX_LEDS);
     #endif
 
     #ifdef SENSOR_3
-        configure_sensor(SENSOR_PIN_3, SENSOR_CHANNEL_3, &adc_config_3, &config_3, &sensor_3);
+        configure_channel(SENSOR_CHANNEL_3, &sensor_config, &config_3);
+        configure_led(LED_STRIP_PIN_3, &strip_config_3, &rmt_config_3, &led_strip_3, MAX_LEDS);
     #endif
     
-    configure_led(LED_STRIP_PIN, &strip_config, &rmt_config, &led_strip, MAX_LEDS);
-    
     while (1) {
-        read_sensor(sensor, ADC_CHANNEL_0, &raw_value);
-        log_values();
-        
-        if (relative_moisture < 25) {
-            blink_led(1, s_led_state, led_strip);
-        } else if (moisture > OPTIMAL_MOISTURE + 10) {
-            blink_led(MAX_LEDS, s_led_state, led_strip);
-        } else {   
-            int index = relative_moisture / 25;
-            toggle_led(index, led_strip);
-        }
+        read_sensor(sensor_config, SENSOR_CHANNEL_1, &raw_value_1);
+        drive_led(led_strip_1, &s_led_state_1, relative_moisture_1, moisture_1);
+        #ifdef SENSOR_2
+            read_sensor(sensor_config, SENSOR_CHANNEL_2, &raw_value_2);
+            drive_led(led_strip_2, &s_led_state_2, relative_moisture_2, moisture_2);
+        #endif
 
-        s_led_state = !s_led_state;
+        #ifdef SENSOR_3
+            read_sensor(sensor_config, SENSOR_CHANNEL_3, &raw_value_3);
+            drive_led(led_strip_3, &s_led_state_3, relative_moisture_3, moisture_3);
+        #endif
+        log_values();
+
         
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         check_timers();

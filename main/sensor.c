@@ -6,12 +6,14 @@
 
 #include "sensor.h"
 
-void configure_sensor(gpio_num_t adc_pin, adc_channel_t channel, adc_oneshot_unit_init_cfg_t *adc_config, adc_oneshot_chan_cfg_t *config, adc_oneshot_unit_handle_t *sensor)
+void configure_unit(adc_unit_t unit, adc_oneshot_unit_init_cfg_t *adc_config, adc_oneshot_unit_handle_t *sensor)
 {
-    adc_config -> unit_id = ADC_UNIT_1;
-
+    adc_config -> unit_id = unit;
     ESP_ERROR_CHECK(adc_oneshot_new_unit(adc_config, sensor));
-    
+}
+
+void configure_channel(adc_channel_t channel, adc_oneshot_unit_handle_t *sensor, adc_oneshot_chan_cfg_t *config)
+{
     config -> bitwidth = ADC_BITWIDTH_DEFAULT;
     config -> atten = ADC_ATTEN_DB_12;
     

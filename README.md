@@ -16,6 +16,7 @@ Preparations Before Flashing
 ----------------------------
 **Open [user_config.h](https://github.com/yunu121/moisture-sensor/blob/main/main/user_config.h) and adjust macros depending on your setup.**
 - Refer to the [ESP32 Datasheet](https://www.espressif.com/sites/default/files/documentation/esp32_datasheet_en.pdf) to determine the correct GPIO pins and ADC channels for your exact specifications.
+- **Note: Use ADC1 for analog readings!**
 
 Now open sdkconfig and search for "Wi-Fi Configuration" and edit the following values based
 on your Wi-Fi settings.
