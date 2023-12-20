@@ -30,16 +30,19 @@ void drive_led(led_strip_handle_t led_strip, int *s_led_state, float relative_mo
         int index = relative_moisture / (100 / MAX_LEDS);
         toggle_led(index, led_strip);
     }
+    
     *s_led_state = !(*s_led_state);
 }
 
 void blink_led(int index, int s_led_state, led_strip_handle_t led_strip)
 {
     if (s_led_state) {
+
         for (int i = 0; i < index; i++) {
             led_strip_set_pixel(led_strip, i, 255, 0, 0);
             led_strip_refresh(led_strip);
         }
+   
     } else {
         led_strip_clear(led_strip);
     }

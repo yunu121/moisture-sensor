@@ -60,11 +60,18 @@
     float moisture_3;
     float relative_moisture_3;
 #endif
-
 /*  Sensor Related Variable Initialisation End  */
 
 /*  Pump Related Variable Initialisation Start  */
 #ifdef PUMP_ENABLED
+    // Initialise pump related variables here
+    #ifdef PUMP_2
+
+    #endif
+
+    #ifdef PUMP_3
+
+    #endif
 #endif
 /*  Pump Related Variable Initialisation End  */
 
@@ -175,6 +182,7 @@ esp_err_t send_web_page(httpd_req_t *req)
     char moisture_str_2[6];
     char moisture_str_3[6];
     char optimal_str[6];
+    
     char timer_str_1[5];
     char timer_str_2[5];
     char timer_str_3[5];
@@ -301,13 +309,16 @@ void check_timers(void)
             #ifdef PUMP_ENABLED
                 float volume = calculate_volume(SOIL_VOLUME, moisture, OPTIMAL_MOISTURE);
                 int seconds = calculate_duration(volume, FLOW_RATE);
+               
                 drive(gpio, seconds);
+               
                 #ifndef PUMP_2
                     drive(gpio, seconds);
                 #endif
                 #ifndef PUMP_3
                     drive(gpio, seconds);
                 #endif
+                
                 timers[i] = 0;
             #endif
         }
@@ -344,10 +355,23 @@ void app_main(void)
         configure_channel(SENSOR_CHANNEL_3, &sensor_config, &config_3);
         configure_led(LED_STRIP_PIN_3, &strip_config_3, &rmt_config_3, &led_strip_3, MAX_LEDS);
     #endif
+
+    /** @note Add pump related code here as required  */
+    #ifdef PUMP_ENABLED
+        
+        // Add code specific to pump 1 (assuming it is enabled by default)
+        #ifdef PUMP_2
+            // Add code specific to pump 2
+        #endif
+        #ifdef PUMP_3
+            // Add code specific to pump 3
+        #endif
+    #endif
     
     while (1) {
         read_sensor(sensor_config, SENSOR_CHANNEL_1, &raw_value_1);
         drive_led(led_strip_1, &s_led_state_1, relative_moisture_1, moisture_1);
+       
         #ifdef SENSOR_2
             read_sensor(sensor_config, SENSOR_CHANNEL_2, &raw_value_2);
             drive_led(led_strip_2, &s_led_state_2, relative_moisture_2, moisture_2);
@@ -357,8 +381,22 @@ void app_main(void)
             read_sensor(sensor_config, SENSOR_CHANNEL_3, &raw_value_3);
             drive_led(led_strip_3, &s_led_state_3, relative_moisture_3, moisture_3);
         #endif
+
+
         log_values();
 
+        /** @note Add pump related code here as required  */
+        #ifdef PUMP_ENABLED
+            // Add code specific to pump 1 (assuming it is enabled by default)
+            
+            #ifdef PUMP_2
+                // Add code specific to pump 2
+            #endif
+            
+            #ifdef PUMP_3
+                // Add code specific to pump 3
+            #endif
+        #endif
         
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         check_timers();

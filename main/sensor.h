@@ -10,17 +10,20 @@
 #include "driver/gpio.h"
 #include "esp_adc/adc_oneshot.h"
 
-/** Configures the sensor.
-    @param  adc_pin    the pin that is connected to the sensor
-    @param  unit       the ADC unit for the sensor
-    @param  channel    the channel of the used pin
+/** Configures the ADC unit.
+    @param  unit       the ADC unit for the sensor(s)
     @param  adc_config pointer to initial ADC configuration
-    @param  config     pointer to ADC configuration
-    @param  sensor     the pointer to the handle for the sensor
+    @param  sensor     the pointer to the handle for the ADC unit
     @return None
 */
 void configure_unit(adc_unit_t unit, adc_oneshot_unit_init_cfg_t *adc_config, adc_oneshot_unit_handle_t *sensor);
 
+/** Configures the ADC channel.
+    @param  channel the ADC channel for the sensor
+    @param  sensor  the pointer to the handle for the ADC unit
+    @param  config  the  pointer to the channel config for the sensor
+    @return None
+*/
 void configure_channel(adc_channel_t channel, adc_oneshot_unit_handle_t *sensor, adc_oneshot_chan_cfg_t *config);
 
 /** Reads from the sensor.

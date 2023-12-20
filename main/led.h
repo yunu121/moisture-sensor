@@ -23,10 +23,10 @@ void configure_led(gpio_num_t gpio_num, led_strip_config_t *strip_config, led_st
 /** Drives LED strip. It can choose to either:
      -- Blink the LED strip to a given index;
      -- Toggle the LED strip on to a given index.
-    @param  led_strip the led strip to drive
-    @param  s_led_state the pointer to the led state
+    @param  led_strip         the led strip to drive
+    @param  s_led_state       the pointer to the led state
     @param  relative_moisture the relative moisture value (to the optimal moisture value)
-    @param  moisture the moisture value
+    @param  moisture          the moisture value
     @return None
 */
 void drive_led(led_strip_handle_t led_strip, int *s_led_state, float relative_moisture, float moisture);

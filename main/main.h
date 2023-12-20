@@ -42,10 +42,10 @@
 #define S_TO_HOURS_1 3600
 
 /** Handles HTTP server events.
-    @param  *arg        the pointer to an argument
+    @param  arg         the pointer to an argument
     @param  event_base  the base of the event
     @param  event_id    the id of the event
-    @param  *event_data the pointer to the event data
+    @param  event_data  the pointer to the event data
     @return None
 */
 static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
@@ -56,13 +56,13 @@ static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_
 void connect_wifi(void);
 
 /** Sends webpage.
-    @param  *req the pointer to the request
+    @param  req the pointer to the HTTP request
     @return The error ID.
 */
 esp_err_t send_web_page(httpd_req_t *req);
 
 /** Gets the request handler.
-    @param  *req the pointer to the request
+    @param  req the pointer to the HTTP request
     @return The error ID.
 */
 esp_err_t get_req_handler(httpd_req_t *req);
@@ -74,9 +74,9 @@ httpd_handle_t setup_server(void);
 
 /** Calculates moisture value and relative moisture (relative to optimal moisture).
     This is based on the upper and lower bounds defined by the user.
-    @param  sensor the sensor number
-    @param  raw_value the raw input value 
-    @param  moisture the pointer to the moisture value
+    @param  sensor            the sensor number
+    @param  raw_value         the raw input value 
+    @param  moisture          the pointer to the moisture value
     @param  relative_moisture the pointer to the relative moisture value
     @return None
 */
