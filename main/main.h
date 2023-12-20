@@ -42,10 +42,10 @@
 #define S_TO_HOURS_1 3600
 
 /** Handles HTTP server events.
-    @param  arg         the pointer to an argument
-    @param  event_base  the base of the event
-    @param  event_id    the id of the event
-    @param  event_data  the pointer to the event data
+    @param  arg        the pointer to an argument
+    @param  event_base the base of the event
+    @param  event_id   the id of the event
+    @param  event_data the pointer to the event data
     @return None
 */
 static void event_handler(void *arg, esp_event_base_t event_base, int32_t event_id, void *event_data);
