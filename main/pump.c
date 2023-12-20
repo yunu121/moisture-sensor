@@ -7,16 +7,16 @@
 
 #include "pump.h"
 
-void configure_pump(uint64_t gpio)
+void configure_pump(gpio_num_t gpio)
 {
     gpio_set_direction(gpio, GPIO_MODE_OUTPUT);
-    gpio_set_pull_mode(gpio, GPIO_PULLUP_ONLY);
 }
 
 float calculate_volume(int soil_volume, float moisture, int optimal_moisture)
 {
     float water_level = moisture * soil_volume / 100;
     float volume = (optimal_moisture * soil_volume) - water_level;
+    
     return volume;
 }
 

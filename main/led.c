@@ -54,6 +54,7 @@ void toggle_led(int index, led_strip_handle_t led_strip)
         led_strip_set_pixel(led_strip, i, 0, 255, 0);
         led_strip_refresh(led_strip);
     }
+    
     for (int i = MAX_LEDS; i < index; i--) {
         led_strip_set_pixel(led_strip, i, 0, 0, 0); // Makes sure that LED strip isn't both green and red when switching states
     }

@@ -64,7 +64,7 @@
 
 /*  Pump Related Variable Initialisation Start  */
 #ifdef PUMP_ENABLED
-    // Initialise pump related variables here
+    // Initialise pump related variables here]
     #ifdef PUMP_2
 
     #endif
@@ -90,7 +90,7 @@ httpd_uri_t uri_get = {
 };
 /*  Server Related Variable Declarations End  */
 
-static float timers[3] = {0, 0, 0};
+static long timers[3] = {0, 0, 0};
 
 
 /*  Server Related Method Definitions Start  */
@@ -183,13 +183,14 @@ esp_err_t send_web_page(httpd_req_t *req)
     char moisture_str_3[6];
     char optimal_str[6];
     
-    char timer_str_1[5];
-    char timer_str_2[5];
-    char timer_str_3[5];
+    char timer_str_1[8];
+    char timer_str_2[8];
+    char timer_str_3[8];
 
     esp_err_t response;
 
     snprintf(moisture_str_1, sizeof(moisture_str_1), "%.1f%%", moisture_1);
+    
     #ifdef SENSOR_2
         snprintf(moisture_str_2, sizeof(moisture_str_2), "%.1f%%", moisture_2);
     #else
@@ -203,9 +204,9 @@ esp_err_t send_web_page(httpd_req_t *req)
     #endif
 
     snprintf(optimal_str, sizeof(optimal_str), "%d%%", OPTIMAL_MOISTURE);
-    snprintf(timer_str_1, sizeof(timer_str_1), "%.2f", timers[0] / S_TO_HOURS_1);
-    snprintf(timer_str_2, sizeof(timer_str_2), "%.2f", timers[1] / S_TO_HOURS_1);
-    snprintf(timer_str_3, sizeof(timer_str_3), "%.2f", timers[2] / S_TO_HOURS_1);
+    snprintf(timer_str_1, sizeof(timer_str_1), "%.2Lf", (long double)(timers[0]) / HOURS_TO_S(1));
+    snprintf(timer_str_2, sizeof(timer_str_2), "%.2Lf", (long double)(timers[1]) / HOURS_TO_S(1));
+    snprintf(timer_str_3, sizeof(timer_str_3), "%.2Lf", (long double)(timers[2]) / HOURS_TO_S(1));
 
     const char resp[] = "<style>"
                         "body {padding: 25px; background-color: black; color: white; font-family: helvetica;}"
@@ -262,51 +263,69 @@ void calculate_values(int sensor, float raw_value, float *moisture, float *relat
 {
     int upper;
     int lower;
+
     switch (sensor) {
         case 1: upper = UPPER_BOUND_1; lower = LOWER_BOUND_1; break;
+        
         case 2: 
             #ifdef SENSOR_2 
                 upper = UPPER_BOUND_2; lower = LOWER_BOUND_2; 
+                break;
             #endif 
-            break;
+        
         case 3: 
             #ifdef SENSOR_3
                 upper = UPPER_BOUND_3; lower = LOWER_BOUND_3;
+                break;
             #endif
-            break;
+        
         default: upper = UPPER_BOUND_1; lower = LOWER_BOUND_1;
     }
+
     *moisture = ((float)(raw_value) - upper) / (lower - upper) * 100;
     *relative_moisture = ((*moisture) / OPTIMAL_MOISTURE) * 100;
 }
 
 void log_values(void) 
 {
-    ESP_LOGI(SENSOR1, "Raw Value = %d", raw_value_1);   
+    ESP_LOGI(SENSOR1, "Raw Value: %d", raw_value_1);   
     calculate_values(1, raw_value_1, &moisture_1, &relative_moisture_1); 
-    ESP_LOGI(SENSOR1, "Moisture = %.1f%%", moisture_1); 
-    ESP_LOGI(SENSOR1, "Relative Moisture = %.1f%%", relative_moisture_1); 
+    ESP_LOGI(SENSOR1, "Moisture: %.1f%%", moisture_1); 
+    ESP_LOGI(SENSOR1, "Relative Moisture: %.1f%%\n", relative_moisture_1); 
     
     #ifdef SENSOR_2
-        ESP_LOGI(SENSOR2, "Raw Value = %d", raw_value_2);   
+        ESP_LOGI(SENSOR2, "Raw Value: %d", raw_value_2);   
         calculate_values(2, raw_value_2, &moisture_2, &relative_moisture_2); 
-        ESP_LOGI(SENSOR2, "Moisture = %.1f%%", moisture_2); 
-        ESP_LOGI(SENSOR2, "Relative Moisture = %.1f%%", relative_moisture_2); 
+        ESP_LOGI(SENSOR2, "Moisture: %.1f%%", moisture_2); 
+        ESP_LOGI(SENSOR2, "Relative Moisture: %.1f%%\n", relative_moisture_2); 
     #endif
 
     #ifdef SENSOR_3
-        ESP_LOGI(SENSOR3, "Raw Value = %d", raw_value_3);   
+        ESP_LOGI(SENSOR3, "Raw Value: %d", raw_value_3);   
         calculate_values(3, raw_value_3, &moisture_3, &relative_moisture_3); 
-        ESP_LOGI(SENSOR3, "Moisture = %.1f%%", moisture_3); 
-        ESP_LOGI(SENSOR3, "Relative Moisture = %.1f%%", relative_moisture_3); 
+        ESP_LOGI(SENSOR3, "Moisture: %.1f%%", moisture_3); 
+        ESP_LOGI(SENSOR3, "Relative Moisture: %.1f%%\n", relative_moisture_3); 
     #endif
 }
 
 void check_timers(void)
 {
+    float moisture;
+
     for (int i = 0; i < 3; i++) {
-        if (timers[i] >= S_TO_HOURS_1) { // Checks if plants haven't been watered in the last hour
-            #ifdef PUMP_ENABLED
+        #ifdef PUMP_ENABLED
+            switch (i) {
+                case 0:
+                    moisture = moisture_1; break;
+                case 1:
+                    moisture = moisture_2; break;
+                case 2:
+                    moisture = moisture_3; break;
+                default:
+                    moisture = moisture_1;
+            }
+
+            if (timers[i] >= HOURS_TO_S(WATERING_PERIOD)) { // Checks if plants haven't been watered in the last given timeframe
                 float volume = calculate_volume(SOIL_VOLUME, moisture, OPTIMAL_MOISTURE);
                 int seconds = calculate_duration(volume, FLOW_RATE);
                
@@ -315,13 +334,14 @@ void check_timers(void)
                 #ifndef PUMP_2
                     drive(gpio, seconds);
                 #endif
+               
                 #ifndef PUMP_3
                     drive(gpio, seconds);
                 #endif
                 
                 timers[i] = 0;
-            #endif
-        }
+            }
+        #endif
         timers[i]++;
     }
 }
@@ -342,7 +362,9 @@ void app_main(void)
     connect_wifi();
     setup_server();
 
-    configure_unit(SENSOR_UNIT_1, &adc_config, &sensor_config); // Sensor 1 is enabled by default
+    /** @note Sensor 1 (and consequently LED strip 1) enabled by default!  */
+    configure_unit(SENSOR_UNIT_1, &adc_config, &sensor_config); 
+   
     configure_channel(SENSOR_CHANNEL_1, &sensor_config, &config_1);
     configure_led(LED_STRIP_PIN_1, &strip_config_1, &rmt_config_1, &led_strip_1, MAX_LEDS);
    
@@ -358,14 +380,19 @@ void app_main(void)
 
     /** @note Add pump related code here as required  */
     #ifdef PUMP_ENABLED
-        
+
+        configure_pump(PUMP_PIN_1);
         // Add code specific to pump 1 (assuming it is enabled by default)
         #ifdef PUMP_2
+            configure_pump(PUMP_PIN_2);
             // Add code specific to pump 2
         #endif
+
         #ifdef PUMP_3
+            configure_pump(PUMP_PIN_3);
             // Add code specific to pump 3
         #endif
+    
     #endif
     
     while (1) {
@@ -382,10 +409,9 @@ void app_main(void)
             drive_led(led_strip_3, &s_led_state_3, relative_moisture_3, moisture_3);
         #endif
 
-
         log_values();
 
-        /** @note Add pump related code here as required  */
+        /** @note Add pump related code here if required  */
         #ifdef PUMP_ENABLED
             // Add code specific to pump 1 (assuming it is enabled by default)
             
@@ -396,6 +422,7 @@ void app_main(void)
             #ifdef PUMP_3
                 // Add code specific to pump 3
             #endif
+        
         #endif
         
         vTaskDelay(1000 / portTICK_PERIOD_MS);

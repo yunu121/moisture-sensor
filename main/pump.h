@@ -12,11 +12,11 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-/** Configures water pump as output with pullup.
+/** Configures water pump as output.
     @param  gpio the GPIO port to set as output.
     @return None
 */
-void configure_pump(uint64_t gpio);
+void configure_pump(gpio_num_t gpio);
 
 /** Calculates the volume of water needed to reach optimal moisture
     for a given soil volume.

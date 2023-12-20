@@ -39,7 +39,6 @@
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT BIT1
 
-#define S_TO_HOURS_1 3600
 
 /** Handles HTTP server events.
     @param  arg        the pointer to an argument

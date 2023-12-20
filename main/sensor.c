@@ -9,6 +9,7 @@
 void configure_unit(adc_unit_t unit, adc_oneshot_unit_init_cfg_t *adc_config, adc_oneshot_unit_handle_t *sensor)
 {
     adc_config -> unit_id = unit;
+    
     ESP_ERROR_CHECK(adc_oneshot_new_unit(adc_config, sensor));
 }
 
